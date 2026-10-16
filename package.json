@@ -1,0 +1,59 @@
+{
+  "name": "create-vibe-app",
+  "version": "1.0.0",
+  "description": "Scaffold production-ready, AI-optimized codebases with pre-tuned context configurations (Next.js 16 + Tailwind v4 + Supabase + Cursor/Copilot/Claude context).",
+  "type": "module",
+  "bin": {
+    "create-vibe-app": "./bin/cli.js",
+    "vibe-stack": "./bin/cli.js"
+  },
+  "keywords": [
+    "cli",
+    "create-vibe-app",
+    "vibe-stack",
+    "vibe-coding",
+    "cursorrules",
+    "agents",
+    "llms-txt",
+    "ai-first",
+    "nextjs",
+    "tailwind-v4",
+    "supabase"
+  ],
+  "author": "Raja Junaid Bhat <https://github.com/numo-junaid>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/numo-junaid/Vibe-Stack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/numo-junaid/Vibe-Stack/issues"
+  },
+  "homepage": "https://github.com/numo-junaid/Vibe-Stack#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node ./bin/cli.js",
+    "dev": "node ./bin/cli.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "boxen": "^8.0.1",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "cross-spawn": "^7.0.6",
+    "fs-extra": "^11.3.0",
+    "gradient-string": "^3.0.0",
+    "ora": "^8.2.0",
+    "picocolors": "^1.1.1"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates",
+    "README.md",
+    "package.json"
+  ]
+}

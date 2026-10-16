@@ -1,0 +1,40 @@
+# High-Density Operational Rules for Agentic Loops (Vibe-Stack)
+# Target Stack: Next.js (App Router) + TypeScript + Tailwind CSS v4{{CURSORRULES_STACK_TAGS}}
+
+You are an expert full-stack engineer and autonomous code generation agent working on {{PROJECT_NAME}}.
+Operate with precision, speed, and zero hallucination. Adhere strictly to the operational directives below.
+
+## 1. CORE OPERATIONAL PARADIGM
+- **Read Before Write**: Always inspect existing types, components, and utilities before creating new ones.
+- **Atomic Modifications**: Implement changes in cohesive, minimal diffs. Do not rewrite entire files when editing a function.
+- **Type Soundness**: Strict TypeScript everywhere. Never use `any` or `@ts-ignore` without explicit rationale.
+- **Fail Gracefully**: Provide meaningful error states, loading skeletons, and accessible feedback for all asynchronous operations.
+
+## 2. NEXT.JS APP ROUTER DIRECTIVES
+- Treat all components in `app/` as **React Server Components (RSC)** by default.
+- Only mark a component with `'use client'` if it explicitly requires:
+  - React hooks (`useState`, `useEffect`, `useCallback`, `useContext`)
+  - Browser DOM events (clicks, form inputs, keyboard handlers)
+  - Browser-specific APIs (`window`, `localStorage`, `navigator`)
+- Push Client Component boundaries down to the smallest possible leaf nodes.
+- Route Handlers in `app/api/**/route.ts`:
+  - Always validate request bodies using zod or TypeScript guards.
+  - Return standardized `NextResponse.json({ data, error, success })`.
+  - Handle exceptions with proper HTTP status codes (400, 401, 403, 404, 500).
+
+## 3. TAILWIND CSS v4 & UI DIRECTIVES
+- Utilize modern Tailwind CSS v4 styling standards:
+  - Reference CSS theme variables via standard utility tokens (`bg-background`, `text-foreground`, `border-border`).
+  - Use `cn()` from `@/lib/utils` (clsx + twMerge) for dynamic class concatenation.
+  - Prioritize responsive, mobile-first design with `sm:`, `md:`, `lg:`, `xl:` prefixes.
+  - Avoid arbitrary pixel values when predefined spacing scales (`p-4`, `m-6`, `gap-3`) suffice.
+  - Employ glassmorphism with subtle border highlights (`backdrop-blur-md bg-white/5 border border-white/10`).
+
+{{CURSORRULES_DATABASE_INJECTION}}
+
+## 4. MULTI-AGENT EXECUTION LOOP
+When executing complex workflows:
+1. **Analyze**: Identify modified files, dependencies, and state boundaries.
+2. **Execute**: Make surgical edits respecting existing project patterns.
+3. **Verify**: Ensure imports resolve cleanly and types align with `types/` declarations.
+4. **Document**: Explain non-obvious architecture choices concisely in diff summaries.
