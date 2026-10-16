@@ -11,9 +11,19 @@
 
 **A highly polished CLI that scaffolds production-ready, AI-optimized codebases with pre-tuned context configurations.**
 
-[Quickstart](#-quickstart) • [Architecture](#-directory-structure) • [Context Engines](#-context-engines-deep-dive) • [CLI Options](#-cli-flags--options) • [Multi-Agent Boundaries](#-multi-agent-execution-boundaries)
+[Quickstart](#-quickstart) • [UI Preview](#-ui-preview) • [Architecture](#-directory-structure) • [Context Engines](#-context-engines-deep-dive) • [CLI Options](#-cli-flags--options)
 
 </div>
+
+---
+
+## 📸 UI & Terminal Preview
+
+### 🌐 Next.js 16 + Tailwind v4 + AI Context Web UI
+![Vibe-Stack Web Application UI](./docs/images/vibe-stack-web-ui.png)
+
+### 💻 Interactive Scaffolding CLI Experience
+![create-vibe-app Terminal CLI](./docs/images/vibe-stack-cli.png)
 
 ---
 

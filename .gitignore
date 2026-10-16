@@ -28,6 +28,8 @@ Thumbs.db
 *.bak
 *.tmp
 
-# Test output
+# Test output and demo playgrounds
 test-output/
 coverage/
+test-scratch/
+demo-app/
