@@ -4,7 +4,7 @@ import { Navbar } from '@/components/Navbar';
 
 export const metadata: Metadata = {
   title: 'Vibe-Stack | AI-Optimized Next.js App',
-  description: 'Production-ready Next.js 16 + Tailwind v4 + Supabase architecture with pre-tuned AI context engines.',
+  description: 'Production-ready Next.js 15 + Tailwind v4 + Supabase architecture with pre-tuned AI context engines.',
   icons: {
     icon: '/favicon.ico',
   },

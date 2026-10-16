@@ -5,12 +5,30 @@ import { fileURLToPath } from 'url';
 /**
  * Builds custom injected section for .cursorrules based on configuration
  */
-export function buildCursorRules(config) {
+export function buildCursorRules(config = {}) {
   const { projectName, supabase = true, tailwind = true } = config;
 
   let stackTags = '';
-  if (supabase) stackTags += ' + Supabase';
   if (tailwind) stackTags += ' + Tailwind v4';
+  if (supabase) stackTags += ' + Supabase';
+
+  let uiRules = '';
+  if (tailwind) {
+    uiRules = `## 3. TAILWIND CSS v4 & UI DIRECTIVES
+- Utilize modern Tailwind CSS v4 styling standards:
+  - Reference CSS theme variables via standard utility tokens (\`bg-background\`, \`text-foreground\`, \`border-border\`).
+  - Use \`cn()\` from \`@/lib/utils\` (clsx + twMerge) for dynamic class concatenation.
+  - Prioritize responsive, mobile-first design with \`sm:\`, \`md:\`, \`lg:\`, \`xl:\` prefixes.
+  - Avoid arbitrary pixel values when predefined spacing scales (\`p-4\`, \`m-6\`, \`gap-3\`) suffice.
+  - Employ glassmorphism with subtle border highlights (\`backdrop-blur-md bg-white/5 border border-white/10\`).`;
+  } else {
+    uiRules = `## 3. UI & STYLING DIRECTIVES
+- Utilize modern standard CSS styling standards:
+  - Reference CSS theme variables from \`app/globals.css\` (\`var(--background)\`, \`var(--foreground)\`, etc.).
+  - Use \`cn()\` from \`@/lib/utils\` for conditional class concatenation.
+  - Prioritize responsive, mobile-first design using standard CSS media queries or utility classes.
+  - Employ glassmorphism styling classes (\`.glass-panel\`, \`.glow-gradient-text\`, \`.ambient-blur\`).`;
+  }
 
   let databaseRules = '';
   if (supabase) {
@@ -38,6 +56,7 @@ export function buildCursorRules(config) {
 
   return {
     stackTags,
+    uiRules,
     databaseRules,
   };
 }
@@ -45,8 +64,22 @@ export function buildCursorRules(config) {
 /**
  * Builds custom injected section for llms.txt
  */
-export function buildLlmsTxt(config) {
-  const { projectName, supabase = true } = config;
+export function buildLlmsTxt(config = {}) {
+  const { projectName, supabase = true, tailwind = true } = config;
+
+  let stylingOverview = '';
+  let cssRole = '';
+  let stylingConvention = '';
+
+  if (tailwind) {
+    stylingOverview = '- **Styling**: Tailwind CSS v4 with modern theme tokens and glassmorphism styling';
+    cssRole = '  - `app/globals.css`: Tailwind v4 theme definitions and design tokens';
+    stylingConvention = "2. **Tailwind v4 Clean Classes**: Do not use legacy `@apply` hacks. Use direct utility classes and CSS theme variables.";
+  } else {
+    stylingOverview = '- **Styling**: Standard CSS with custom design tokens, cyber gradients, and glassmorphic utilities';
+    cssRole = '  - `app/globals.css`: Standard CSS theme definitions, glassmorphism, and color variables';
+    stylingConvention = "2. **Standard CSS Tokens**: Use clean CSS variables and semantic classes defined in `app/globals.css`.";
+  }
 
   let databaseOverview = '';
   let libFiles = '';
@@ -92,6 +125,9 @@ create policy "Users can update their own profile."
   }
 
   return {
+    stylingOverview,
+    cssRole,
+    stylingConvention,
     databaseOverview,
     libFiles,
     databaseSchema,
@@ -101,11 +137,35 @@ create policy "Users can update their own profile."
 /**
  * Builds custom injected section for AGENTS.md
  */
-export function buildAgentsMd(config) {
-  const { supabase = true } = config;
+export function buildAgentsMd(config = {}) {
+  const { supabase = true, tailwind = true } = config;
 
+  let frontendRole = '';
+  if (tailwind) {
+    frontendRole = `### 🎨 Agent 2: Frontend & UI Engineer (\`@frontend\`)
+- **Primary Domain**: React components, Tailwind v4 styling, UX states, animations, accessibility.
+- **Execution Boundaries**:
+  - May modify: \`components/**\`, \`app/**/page.tsx\`, \`app/globals.css\`.
+  - May NOT execute raw database queries or mutate server-side secret credentials.
+- **Standard Operating Procedure**:
+  - Enforces Server Component boundaries; delegates interactive triggers to client leaves.
+  - Uses Tailwind v4 classes and glassmorphic micro-interactions.
+  - Handles loading states with skeletons and empty states with clear calls-to-action.`;
+  } else {
+    frontendRole = `### 🎨 Agent 2: Frontend & UI Engineer (\`@frontend\`)
+- **Primary Domain**: React components, standard CSS styling, UX states, animations, accessibility.
+- **Execution Boundaries**:
+  - May modify: \`components/**\`, \`app/**/page.tsx\`, \`app/globals.css\`.
+  - May NOT execute raw database queries or mutate server-side secret credentials.
+- **Standard Operating Procedure**:
+  - Enforces Server Component boundaries; delegates interactive triggers to client leaves.
+  - Uses standard CSS tokens and glassmorphic micro-interactions.
+  - Handles loading states with skeletons and empty states with clear calls-to-action.`;
+  }
+
+  let databaseRole = '';
   if (supabase) {
-    return `### 🗄️ Agent 3: Database & Backend Engineer (\`@database\`)
+    databaseRole = `### 🗄️ Agent 3: Database & Backend Engineer (\`@database\`)
 - **Primary Domain**: Supabase schemas, SQL migrations, Row Level Security (RLS), edge functions.
 - **Execution Boundaries**:
   - May modify: \`lib/supabase/**\`, \`types/database.ts\`, SQL migration scripts, database policies.
@@ -114,9 +174,8 @@ export function buildAgentsMd(config) {
   - Every table must have explicit RLS policies for SELECT, INSERT, UPDATE, DELETE.
   - Keeps \`types/database.ts\` synchronised with the PostgreSQL database schema.
   - Implements secure server-side queries using \`@supabase/ssr\` cookie adapters.`;
-  }
-
-  return `### 🗄️ Agent 3: API & Backend Engineer (\`@backend\`)
+  } else {
+    databaseRole = `### 🗄️ Agent 3: API & Backend Engineer (\`@backend\`)
 - **Primary Domain**: Next.js Route Handlers, server actions, external API integrations.
 - **Execution Boundaries**:
   - May modify: \`app/api/**\`, backend service utilities, integration types.
@@ -124,6 +183,38 @@ export function buildAgentsMd(config) {
 - **Standard Operating Procedure**:
   - Enforces schema validation on all incoming payload bodies.
   - Implements predictable HTTP status codes and error payloads.`;
+  }
+
+  const delegationRole = supabase ? '@database' : '@backend';
+
+  return {
+    frontendRole,
+    databaseRole,
+    delegationRole,
+  };
+}
+
+import {
+  applyNamingTransform,
+  applySupabaseTransform,
+  applyTailwindTransform,
+  applyAiContextTransform,
+} from './transforms.js';
+
+/**
+ * Configures project dependencies, naming, and files based on feature flags.
+ * Runs unconditionally regardless of AI context flag.
+ * @param {string} projectPath 
+ * @param {object} config 
+ */
+export async function configureProject(projectPath, config = {}) {
+  const projectName = config.projectName || path.basename(projectPath);
+  const supabase = config.supabase !== false;
+  const tailwind = config.tailwind !== false;
+
+  await applyNamingTransform(projectPath, projectName);
+  await applySupabaseTransform(projectPath, supabase);
+  await applyTailwindTransform(projectPath, tailwind);
 }
 
 /**
@@ -131,91 +222,7 @@ export function buildAgentsMd(config) {
  * @param {string} projectPath 
  * @param {object} config 
  */
-export async function injectContext(projectPath, config) {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const templateAiDir = path.resolve(__dirname, '../../templates/ai-config');
-
-  const projectName = config.projectName || path.basename(projectPath);
-
-  // 1. Process .cursorrules
-  const cursorRulesPath = path.join(templateAiDir, '.cursorrules');
-  if (await fs.pathExists(cursorRulesPath)) {
-    let cursorRulesContent = await fs.readFile(cursorRulesPath, 'utf8');
-    const { stackTags, databaseRules } = buildCursorRules(config);
-
-    cursorRulesContent = cursorRulesContent
-      .replace(/\{\{PROJECT_NAME\}\}/g, projectName)
-      .replace(/\{\{CURSORRULES_STACK_TAGS\}\}/g, stackTags)
-      .replace(/\{\{CURSORRULES_DATABASE_INJECTION\}\}/g, databaseRules);
-
-    await fs.writeFile(path.join(projectPath, '.cursorrules'), cursorRulesContent, 'utf8');
-  }
-
-  // 2. Process llms.txt
-  const llmsPath = path.join(templateAiDir, 'llms.txt');
-  if (await fs.pathExists(llmsPath)) {
-    let llmsContent = await fs.readFile(llmsPath, 'utf8');
-    const { databaseOverview, libFiles, databaseSchema } = buildLlmsTxt(config);
-
-    llmsContent = llmsContent
-      .replace(/\{\{PROJECT_NAME\}\}/g, projectName)
-      .replace(/\{\{LLMS_DATABASE_OVERVIEW\}\}/g, databaseOverview)
-      .replace(/\{\{LLMS_LIB_FILES\}\}/g, libFiles)
-      .replace(/\{\{LLMS_DATABASE_SCHEMA\}\}/g, databaseSchema);
-
-    await fs.writeFile(path.join(projectPath, 'llms.txt'), llmsContent, 'utf8');
-  }
-
-  // 3. Process AGENTS.md
-  const agentsPath = path.join(templateAiDir, 'AGENTS.md');
-  if (await fs.pathExists(agentsPath)) {
-    let agentsContent = await fs.readFile(agentsPath, 'utf8');
-    const databaseRole = buildAgentsMd(config);
-
-    agentsContent = agentsContent
-      .replace(/\{\{PROJECT_NAME\}\}/g, projectName)
-      .replace(/\{\{AGENTS_DATABASE_ROLE\}\}/g, databaseRole);
-
-    await fs.writeFile(path.join(projectPath, 'AGENTS.md'), agentsContent, 'utf8');
-  }
-
-  // 4. Adjust project dependencies and files if Supabase is disabled
-  if (!config.supabase) {
-    const supabaseLibDir = path.join(projectPath, 'lib', 'supabase');
-    if (await fs.pathExists(supabaseLibDir)) {
-      await fs.remove(supabaseLibDir);
-    }
-
-    const typesDbFile = path.join(projectPath, 'types', 'database.ts');
-    if (await fs.pathExists(typesDbFile)) {
-      await fs.remove(typesDbFile);
-    }
-  }
-
-  // 5. Adjust target project package.json
-  const targetPkgPath = path.join(projectPath, 'package.json');
-  if (await fs.pathExists(targetPkgPath)) {
-    const pkg = await fs.readJson(targetPkgPath);
-    pkg.name = projectName;
-    if (!config.supabase) {
-      if (pkg.dependencies) {
-        delete pkg.dependencies['@supabase/supabase-js'];
-        delete pkg.dependencies['@supabase/ssr'];
-      }
-    }
-    await fs.writeJson(targetPkgPath, pkg, { spaces: 2 });
-  }
-
-  // 6. Adjust .env.example
-  const envExamplePath = path.join(projectPath, '.env.example');
-  if (await fs.pathExists(envExamplePath)) {
-    let envContent = await fs.readFile(envExamplePath, 'utf8');
-    if (!config.supabase) {
-      envContent = envContent
-        .replace(/NEXT_PUBLIC_SUPABASE_URL=.*\n/g, '')
-        .replace(/NEXT_PUBLIC_SUPABASE_ANON_KEY=.*\n/g, '');
-    }
-    await fs.writeFile(envExamplePath, envContent, 'utf8');
-  }
+export async function injectContext(projectPath, config = {}) {
+  await configureProject(projectPath, config);
+  await applyAiContextTransform(projectPath, config);
 }

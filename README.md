@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16%20App%20Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15%20App%20Router-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-SSR%20%2B%20RLS-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com/)
 [![AI-Ready](https://img.shields.io/badge/AI_Context-Cursor%20%7C%20Claude%20%7C%20Copilot-purple?style=flat-square)](https://cursor.com/)
@@ -19,7 +19,7 @@
 
 ## 📸 UI & Terminal Preview
 
-### 🌐 Next.js 16 + Tailwind v4 + AI Context Web UI
+### 🌐 Next.js 15 + Tailwind v4 + AI Context Web UI
 ![Vibe-Stack Web Application UI](./docs/images/vibe-stack-web-ui.png)
 
 ### 💻 Interactive Scaffolding CLI Experience
@@ -33,7 +33,7 @@ Traditional starter kits give you frontend boilerplate, but they leave your AI c
 
 **Vibe-Stack solves this at the architectural root.** 
 
-When you scaffold a project with `create-vibe-app`, the CLI dynamically generates and injects targeted **Context Engines** (`.cursorrules`, `AGENTS.md`, and `llms.txt`) tuned precisely to your chosen stack (Next.js 16 + Tailwind v4 + Supabase). Your AI editor (Cursor, Windsurf, Copilot, or Claude Code) immediately acts like a senior staff engineer with full domain awareness from minute one.
+When you scaffold a project with `create-vibe-app`, the CLI dynamically generates and injects targeted **Context Engines** (`.cursorrules`, `AGENTS.md`, and `llms.txt`) tuned precisely to your chosen stack (Next.js 15 + Tailwind v4 + Supabase). Your AI editor (Cursor, Windsurf, Copilot, or Claude Code) immediately acts like a senior staff engineer with full domain awareness from minute one.
 
 ---
 
@@ -44,7 +44,7 @@ vibe-stack/
 ├── bin/
 │   └── cli.js                  # CLI entry point (arg parsing & orchestration)
 ├── templates/
-│   ├── base-next/              # Next.js 16 + Tailwind v4 + Supabase layout
+│   ├── base-next/              # Next.js 15 + Tailwind v4 + Supabase layout
 │   │   ├── app/
 │   │   │   ├── api/health/     # Health check & system status route
 │   │   │   ├── globals.css     # Tailwind v4 theme tokens & glassmorphic styles
@@ -186,5 +186,6 @@ npm test
 
 ## 🛡️ License
 
-MIT License © 2026
+MIT License © 2026.
 Built with passion for the autonomous coding revolution.
+

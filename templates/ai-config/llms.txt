@@ -4,7 +4,7 @@
 
 ## Architecture Overview
 - **Framework**: Next.js (App Router, React 19, TypeScript)
-- **Styling**: Tailwind CSS v4 with modern theme tokens and glassmorphism styling
+{{LLMS_STYLING_OVERVIEW}}
 - **Components**: Radix UI primitives & Lucide Icons
 {{LLMS_DATABASE_OVERVIEW}}
 - **AI Context Layer**: Pre-tuned context engines (.cursorrules, AGENTS.md, llms.txt)
@@ -13,7 +13,7 @@
 - `app/`: Next.js App Router root
   - `app/layout.tsx`: Root layout, fonts, dark mode class, global header/footer wrappers
   - `app/page.tsx`: Landing page & interactive showcase
-  - `app/globals.css`: Tailwind v4 theme definitions and design tokens
+{{LLMS_CSS_ROLE}}
   - `app/api/`: Edge and Node.js Route Handlers (JSON responses, standard HTTP status codes)
 - `components/`: Modular, reusable UI components adhering to single-responsibility design
 - `lib/`: Shared utilities, helpers, and client configurations
@@ -24,7 +24,7 @@
 
 ## Coding Conventions for LLMs
 1. **React Server Components (RSC) First**: Default all components in `app/` to Server Components. Only add `'use client'` when state, effects, or browser APIs are mandatory.
-2. **Tailwind v4 Clean Classes**: Do not use legacy `@apply` hacks. Use direct utility classes and CSS theme variables.
+{{LLMS_STYLING_CONVENTION}}
 3. **Strict TypeScript**: Avoid `any`. Type all props, API inputs, and database records.
 4. **Environment Variables**: Access client variables via `process.env.NEXT_PUBLIC_*` and server secrets via `process.env.*`. Never expose service keys to the client.
 5. **Clean Async & Error Handling**: Wrap data-fetching logic with proper fallback UI, loading skeletons, and error boundaries.

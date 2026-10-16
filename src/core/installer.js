@@ -80,12 +80,16 @@ export function getPackageManagerCommands(pm) {
  * @returns {Promise<boolean>}
  */
 export function installDependencies(projectPath, pm = 'npm', silent = true) {
+  const validPms = ['npm', 'pnpm', 'yarn', 'bun'];
+  if (!validPms.includes(pm)) {
+    return Promise.reject(new Error(`Unsupported package manager: "${pm}". Supported package managers are: ${validPms.join(', ')}`));
+  }
+
   return new Promise((resolve, reject) => {
     const commands = getPackageManagerCommands(pm);
     const child = spawn(pm, commands.install, {
       cwd: projectPath,
       stdio: silent ? 'ignore' : 'inherit',
-      shell: true,
     });
 
     child.on('close', (code) => {
@@ -120,10 +124,19 @@ export function initGitRepository(projectPath) {
     }
 
     execSync('git add -A', { cwd: projectPath, stdio: 'ignore' });
-    execSync('git commit -m "chore: initial commit from create-vibe-app (Vibe-Stack)"', {
-      cwd: projectPath,
-      stdio: 'ignore',
-    });
+    try {
+      execSync('git commit -m "chore: initial commit from create-vibe-app (Vibe-Stack)"', {
+        cwd: projectPath,
+        stdio: 'ignore',
+      });
+    } catch {
+      try {
+        execSync('git -c user.name="Vibe Bot" -c user.email="bot@vibe-stack.dev" commit -m "chore: initial commit from create-vibe-app (Vibe-Stack)"', {
+          cwd: projectPath,
+          stdio: 'ignore',
+        });
+      } catch {}
+    }
     return true;
   } catch (error) {
     return false;

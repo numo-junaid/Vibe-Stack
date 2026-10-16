@@ -1,7 +1,7 @@
 {
   "name": "create-vibe-app",
   "version": "1.0.0",
-  "description": "Scaffold production-ready, AI-optimized codebases with pre-tuned context configurations (Next.js 16 + Tailwind v4 + Supabase + Cursor/Copilot/Claude context).",
+  "description": "Scaffold production-ready, AI-optimized codebases with pre-tuned context configurations (Next.js 15 + Tailwind v4 + Supabase + Cursor/Copilot/Claude context).",
   "type": "module",
   "bin": {
     "create-vibe-app": "./bin/cli.js",
@@ -20,7 +20,7 @@
     "tailwind-v4",
     "supabase"
   ],
-  "author": "Raja Junaid Bhat <https://github.com/numo-junaid>",
+  "author": "Junaid Bhat <https://github.com/numo-junaid>",
   "license": "MIT",
   "repository": {
     "type": "git",

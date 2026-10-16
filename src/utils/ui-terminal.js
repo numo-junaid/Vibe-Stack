@@ -98,9 +98,9 @@ export function displaySuccessSummary({
     .map(f => `  ${theme.success('✔')} ${chalk.white(f.name)} ${theme.dim(`(${f.desc})`)}`)
     .join('\n');
 
-  const contextList = contextFiles
-    .map(c => `  ${theme.accent('✦')} ${theme.code(c.file)} ${theme.dim(`- ${c.role}`)}`)
-    .join('\n');
+  const contextList = contextFiles && contextFiles.length > 0
+    ? contextFiles.map(c => `  ${theme.accent('✦')} ${theme.code(c.file)} ${theme.dim(`- ${c.role}`)}`).join('\n')
+    : `  ${theme.dim('None (AI context generation skipped)')}`;
 
   const content = `
 ${vibeGradient.multiline('✨ YOUR VIBE-STACK IS READY FOR AGENTIC LOOPS ✨')}

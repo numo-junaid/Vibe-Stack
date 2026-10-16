@@ -35,7 +35,7 @@ export function Hero() {
         </h1>
 
         <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-          A production-ready stack scaffolded specifically for agentic loops. Next.js 16, Tailwind v4, and Supabase pre-loaded with high-density architectural context engines.
+          A production-ready stack scaffolded specifically for agentic loops. Next.js 15, Tailwind v4, and Supabase pre-loaded with high-density architectural context engines.
         </p>
 
         {/* Stack Badges */}

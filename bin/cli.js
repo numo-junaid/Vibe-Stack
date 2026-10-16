@@ -14,12 +14,9 @@ import {
   theme,
   printError,
 } from '../src/utils/ui-terminal.js';
-import {
-  detectPackageManager,
-  installDependencies,
-  initGitRepository,
-} from '../src/core/installer.js';
-import { injectContext } from '../src/core/dynamic-injector.js';
+import { detectPackageManager } from '../src/core/installer.js';
+import { generateProject } from '../src/core/generator.js';
+import { validateCliOptions, validateTargetDirectory } from '../src/core/validator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +43,7 @@ program
   .option('--no-install', 'Do not install dependencies')
   .option('--git', 'Initialize a new git repository', true)
   .option('--no-git', 'Do not initialize a git repository')
+  .option('--overwrite', 'Overwrite existing files in target directory if it already exists', false)
   .option('-y, --yes', 'Skip prompts and accept all intelligent defaults', false)
   .action(async (targetDirArg, options) => {
     try {
@@ -56,6 +54,10 @@ program
     }
   });
 
+/**
+ * Main CLI Action Runner
+ * Handles argument parsing, interactive user prompts, and UI feedback
+ */
 async function runCLI(targetDirArg, options) {
   displayBanner();
 
@@ -66,8 +68,12 @@ async function runCLI(targetDirArg, options) {
   let packageManager = options.packageManager || detectPackageManager();
   let shouldInstall = options.install;
   let shouldGit = options.git;
+  let shouldOverwrite = options.overwrite;
 
-  // Interactive flow when not run with --yes flag or if targetDir is omitted
+  // 1. Pre-validate CLI options before interactive prompts
+  await validateCliOptions(options, ROOT_DIR);
+
+  // 2. Interactive prompt flow when not using --yes
   if (!options.yes && (!targetDir || !options.packageManager)) {
     clack.intro(theme.highlight('⚡ Initiate Vibe-Stack Scaffolding Engine'));
 
@@ -107,6 +113,28 @@ async function runCLI(targetDirArg, options) {
       process.exit(0);
     }
     useSupabase = dbChoice === 'supabase';
+
+    const stylingChoice = await clack.select({
+      message: 'Select your Styling framework:',
+      options: [
+        {
+          value: 'tailwind',
+          label: 'Tailwind CSS v4 (Modern tokens, @import "tailwindcss")',
+          hint: 'Recommended for rapid UI iteration',
+        },
+        {
+          value: 'css',
+          label: 'Standard CSS (CSS variables, glassmorphic utilities)',
+          hint: 'Zero external styling dependencies',
+        },
+      ],
+      initialValue: useTailwind ? 'tailwind' : 'css',
+    });
+    if (clack.isCancel(stylingChoice)) {
+      clack.cancel('Scaffolding aborted.');
+      process.exit(0);
+    }
+    useTailwind = stylingChoice === 'tailwind';
 
     const contextChoice = await clack.multiselect({
       message: 'Select AI Context Engines to tune and inject:',
@@ -170,106 +198,88 @@ async function runCLI(targetDirArg, options) {
     }
   }
 
-  // Resolve target directory path
+  // 3. Interactive directory collision handling
   const projectPath = path.resolve(process.cwd(), targetDir);
-  const projectName = path.basename(projectPath);
-
-  // Check destination directory
-  if (await fs.pathExists(projectPath)) {
-    const files = await fs.readdir(projectPath);
-    if (files.length > 0) {
-      if (!options.yes) {
-        const overwrite = await clack.confirm({
-          message: `Directory "${projectName}" is not empty. Continue and overwrite existing files?`,
-          initialValue: false,
-        });
-        if (clack.isCancel(overwrite) || !overwrite) {
-          clack.cancel('Scaffolding aborted to protect existing files.');
-          process.exit(0);
-        }
+  const dirStatus = await validateTargetDirectory(projectPath, { overwrite: shouldOverwrite });
+  if (dirStatus.exists && !dirStatus.isEmpty && !shouldOverwrite) {
+    if (!options.yes) {
+      const confirmOverwrite = await clack.confirm({
+        message: `Directory "${path.basename(projectPath)}" is not empty. Continue and overwrite existing files?`,
+        initialValue: false,
+      });
+      if (clack.isCancel(confirmOverwrite) || !confirmOverwrite) {
+        printError(`Target directory "${path.basename(projectPath)}" is not empty. Aborting to protect existing files.`);
+        process.exit(1);
       }
+      shouldOverwrite = true;
     }
   }
 
-  // 1. Copy base template
-  const spinner = createSpinner('Scaffolding project structure from base-next...').start();
-  const templateDir = path.join(ROOT_DIR, 'templates', options.template || 'base-next');
-
-  if (!(await fs.pathExists(templateDir))) {
-    spinner.fail(`Template "${options.template}" not found.`);
-    process.exit(1);
-  }
-
-  await fs.ensureDir(projectPath);
-  await fs.copy(templateDir, projectPath, {
-    filter: (src) => {
-      const rel = path.relative(templateDir, src);
-      return !rel.includes('node_modules') && !rel.includes('.next');
-    },
-  });
-
-  // Ensure .gitignore is properly named
-  const gitignoreAlt = path.join(projectPath, '_gitignore');
-  const gitignoreTarget = path.join(projectPath, '.gitignore');
-  if (await fs.pathExists(gitignoreAlt)) {
-    await fs.move(gitignoreAlt, gitignoreTarget, { overwrite: true });
-  }
-
-  spinner.succeed(`Base template scaffolded into ${chalk.cyan(targetDir)}`);
-
-  // 2. Dynamic Context Injection
-  if (useAiContext) {
-    const contextSpinner = createSpinner('Injecting pre-tuned AI Context Engines...').start();
-    await injectContext(projectPath, {
-      projectName,
+  // 4. Delegate project generation, transformations & validation to src/core/generator.js
+  let currentSpinner = null;
+  const projectMetadata = await generateProject(
+    {
+      targetDir,
+      template: options.template,
       supabase: useSupabase,
       tailwind: useTailwind,
+      aiContext: useAiContext,
       packageManager,
-    });
-    contextSpinner.succeed('Context Engines tuned & injected (.cursorrules, AGENTS.md, llms.txt)');
-  }
-
-  // 3. Git Initialization
-  if (shouldGit) {
-    const gitSpinner = createSpinner('Initializing git repository...').start();
-    const gitSuccess = initGitRepository(projectPath);
-    if (gitSuccess) {
-      gitSpinner.succeed('Git repository initialized with initial commit.');
-    } else {
-      gitSpinner.warn('Git initialization skipped (git command not found or repo already exists).');
+      install: shouldInstall,
+      git: shouldGit,
+      overwrite: shouldOverwrite,
+      rootDir: ROOT_DIR,
+    },
+    {
+      onStepStart: (step, message) => {
+        if (currentSpinner) currentSpinner.stop();
+        currentSpinner = createSpinner(message).start();
+      },
+      onStepSuccess: (step, message) => {
+        if (currentSpinner) {
+          currentSpinner.succeed(message);
+          currentSpinner = null;
+        }
+      },
+      onStepFail: (step, message) => {
+        if (currentSpinner) {
+          currentSpinner.fail(message);
+          currentSpinner = null;
+        }
+      },
+      onStepWarn: (step, message) => {
+        if (currentSpinner) {
+          currentSpinner.warn(message);
+          currentSpinner = null;
+        }
+      },
     }
-  }
+  );
 
-  // 4. Install Dependencies
-  if (shouldInstall) {
-    const installSpinner = createSpinner(`Installing dependencies via ${packageManager}...`).start();
-    try {
-      await installDependencies(projectPath, packageManager, true);
-      installSpinner.succeed(`Dependencies installed successfully with ${packageManager}.`);
-    } catch (err) {
-      installSpinner.warn(`Automatic dependency installation failed: ${err.message}. You can run "${packageManager} install" manually.`);
-    }
-  }
-
-  // 5. Success Summary Box
+  // 5. Present Success Summary Output
   displaySuccessSummary({
-    projectName,
-    projectPath,
-    packageManager,
+    projectName: projectMetadata.projectName,
+    projectPath: projectMetadata.projectPath,
+    packageManager: projectMetadata.packageManager,
     features: [
-      { name: 'Next.js 16 (App Router)', desc: 'React 19 & Server Components' },
-      { name: 'Tailwind CSS v4', desc: 'Modern styling tokens & glassmorphism' },
+      { name: 'Next.js 15 (App Router)', desc: 'React 19 & Server Components' },
+      {
+        name: useTailwind ? 'Tailwind CSS v4' : 'Standard CSS',
+        desc: useTailwind ? 'Modern styling tokens & glassmorphism' : 'Clean CSS variables & glassmorphism',
+      },
       {
         name: useSupabase ? 'Supabase & Auth' : 'REST Route Handlers',
         desc: useSupabase ? 'Postgres, RLS, @supabase/ssr' : 'Lightweight API structure',
       },
       { name: 'Strict TypeScript', desc: 'Type-safe contracts & schema mappings' },
     ],
-    contextFiles: [
-      { file: '.cursorrules', role: 'Operational agent loops & strict engineering rules' },
-      { file: 'AGENTS.md', role: 'Multi-agent role division (@architect, @frontend, @database, @qa)' },
-      { file: 'llms.txt', role: 'Semantic project map for LLM crawlers & external agents' },
-    ],
+    contextFiles: useAiContext
+      ? [
+          { file: '.cursorrules', role: 'Operational agent loops & strict engineering rules' },
+          { file: 'AGENTS.md', role: 'Multi-agent role division (@architect, @frontend, @database, @qa)' },
+          { file: 'llms.txt', role: 'Semantic project map for LLM crawlers & external agents' },
+        ]
+      : [],
   });
 }
 

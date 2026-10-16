@@ -16,15 +16,7 @@ This document defines the agentic boundaries and operational roles for autonomou
   - Ensures clean separation between server-only logic (`lib/server/`) and client utilities.
   - Defines shared TypeScript interfaces in `types/` before implementation begins.
 
-### 🎨 Agent 2: Frontend & UI Engineer (`@frontend`)
-- **Primary Domain**: React components, Tailwind v4 styling, UX states, animations, accessibility.
-- **Execution Boundaries**:
-  - May modify: `components/**`, `app/**/page.tsx`, `app/globals.css`.
-  - May NOT execute raw database queries or mutate server-side secret credentials.
-- **Standard Operating Procedure**:
-  - Enforces Server Component boundaries; delegates interactive triggers to client leaves.
-  - Uses Tailwind v4 classes and glassmorphic micro-interactions.
-  - Handles loading states with skeletons and empty states with clear calls-to-action.
+{{AGENTS_FRONTEND_ROLE}}
 
 {{AGENTS_DATABASE_ROLE}}
 
@@ -45,4 +37,4 @@ This document defines the agentic boundaries and operational roles for autonomou
 When an agent finishes its phase:
 1. **State Summary**: Declare what was implemented, what was verified, and any remaining blockers.
 2. **Contract Verification**: Confirm that all new functions or data shapes match the interfaces defined in `types/`.
-3. **Delegation**: Explicitly hand off to the next agent persona (e.g. `@architect` -> `@database` -> `@frontend` -> `@qa`).
+3. **Delegation**: Explicitly hand off to the next agent persona (e.g. `@architect` -> `{{AGENTS_DELEGATION_ROLE}}` -> `@frontend` -> `@qa`).
