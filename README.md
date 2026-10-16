@@ -186,5 +186,5 @@ npm test
 
 ## 🛡️ License
 
-MIT License © 2026 [Raja Junaid Bhat](https://github.com/numo-junaid).
+MIT License © 2026 [Junaid Bhat](https://github.com/numo-junaid).
 Built with passion for the autonomous coding revolution.
